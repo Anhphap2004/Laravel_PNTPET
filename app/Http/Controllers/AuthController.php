@@ -25,17 +25,23 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        // Tìm người dùng theo username
-        $user = User::where('username', $request->username)->first();
+        // Kiểm tra đăng nhập
+        if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
+            $user = Auth::user(); // Lấy thông tin user đã đăng nhập
 
-        // Nếu người dùng tồn tại và mật khẩu đúng
-        if ($user && Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
-            session()->put('user_id', Auth::id());
-            session()->put('username', Auth::user()->username); // Lưu tên user
-            return redirect()->route('home')->with('success', 'Đăng nhập thành công!');
+            // Lưu thông tin vào session
+            session()->put('user_id', $user->id);
+            session()->put('username', $user->username);
+            session()->put('role', $user->role); // Lưu role vào session
+
+            // Kiểm tra vai trò và điều hướng
+            if ($user->role === 'admin') {
+                return redirect()->route('admin.dashboard')->with('success', 'Chào mừng Admin!');
+            } else {
+                return redirect()->route('home')->with('success', 'Đăng nhập thành công!');
+            }
         }
 
-        // Nếu thông tin đăng nhập không chính xác
         return back()->withErrors(['login' => 'Thông tin đăng nhập không chính xác.']);
     }
 

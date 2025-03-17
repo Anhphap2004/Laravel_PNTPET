@@ -16,6 +16,7 @@ class HomeController extends Controller
         $gallery = DB::table('gallery')->get();
         $testimonial = DB::table('testimonial')->get();
         $blogs = DB::table('blog_posts')->get();
+
         return view('index', compact('about', 'services', 'animals','prices','gallery', 'testimonial','blogs'));
     }
 }
