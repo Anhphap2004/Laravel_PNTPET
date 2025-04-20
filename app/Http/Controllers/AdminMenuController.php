@@ -10,7 +10,7 @@ class AdminMenuController extends Controller
     // Hiển thị danh sách menu
     public function index()
     {
-        $menus = DB::table('menu_items')->get(); // Lấy toàn bộ menu
+        $menus = DB::table('menu_items')->orderBy('order_index')->get();
         return view('admin.menu.index', compact('menus'));
     }
 
@@ -21,22 +21,33 @@ class AdminMenuController extends Controller
     }
 
     // Xử lý thêm menu
-    public function store(Request $request)
+  public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'link' => 'required|string|max:255',
+            'title' => 'required|string|max:100',
+            'url' => 'nullable|string|max:255',
+            'icon_class' => 'nullable|string|max:50',
+            'target' => 'nullable|in:_self,_blank,_parent,_top',
+            'order_index' => 'nullable|integer',
+            'status' => 'in:active,inactive'
         ]);
 
         DB::table('menu_items')->insert([
-            'name' => $request->name,
-            'link' => $request->link,
+            'menu_id' => $request->menu_id, // 🛑 phải có dòng này
+            'title' => $request->title,
+            'url' => $request->url,
+            'icon_class' => $request->icon_class,
+            'target' => $request->target ?? '_self',
+            'order_index' => $request->order_index ?? 0,
+            'status' => $request->status ?? 'active',
             'created_at' => now(),
-            'updated_at' => now(),
+            'updated_at' => now()
         ]);
 
-        return redirect()->route('admin.menu.index')->with('success', 'Thêm menu thành công!');
+
+        return redirect()->route('admin.menu.index')->with('success', '🧡 Thêm menu thành công!');
     }
+    
 
     // Hiển thị form chỉnh sửa menu
     public function edit($id)
@@ -71,7 +82,17 @@ class AdminMenuController extends Controller
     // Xóa menu
     public function destroy($id)
     {
-        DB::table('menu_items')->where('id', $id)->delete();
-        return redirect()->route('admin.menu.index')->with('success', 'Xóa menu thành công!');
+        // Tìm menu theo ID
+        $menu = DB::table('menu_items')->where('item_id', $id)->first();
+    
+        if (!$menu) {
+            return redirect()->route('admin.menu.index')->with('error', 'Menu không tồn tại.');
+        }
+    
+        // Xoá menu
+        DB::table('menu_items')->where('item_id', $id)->delete();
+    
+        return redirect()->route('admin.menu.index')->with('success', 'Xoá menu thành công.');
     }
+    
 }

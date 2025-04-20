@@ -1,49 +1,220 @@
 @extends('admin.layouts.master')
 
 @section('content')
-<div class="container" style="max-width: 500px; margin: 0 auto;">
-    <div style="background: linear-gradient(145deg, #f6f8fa, #ffffff); border-radius: 10px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); padding: 1.5rem; margin: 1.5rem auto;">
-        <h2 style="color: #3a3a3a; font-weight: 600; text-align: center; margin-bottom: 1.2rem; position: relative; padding-bottom: 10px; font-size: 1.5rem;">
-            Sửa Menu
-            <span style="display: block; width: 60px; height: 2px; background: linear-gradient(90deg, #6c63ff, #b382ff); position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); border-radius: 10px;"></span>
-        </h2>
+<style>
+    /* Fix sidebar overlap issue */
+    .content-wrapper {
+        margin-left: 230px;
+        padding: 15px 20px 0 20px;
+        background-color: white;
+    }
 
+    /* Responsive adjustment for mobile */
+    @media (max-width: 992px) {
+        .content-wrapper {
+            margin-left: 0;
+            padding: 10px;
+        }
+    }
+
+    /* Page header and intro */
+    .page-intro {
+        margin-bottom: 15px;
+    }
+
+    .page-intro h4 {
+        margin-top: 0;
+        margin-bottom: 5px;
+        color: #333;
+        font-weight: 600;
+    }
+
+    .page-intro p {
+        margin-top: 0;
+        margin-bottom: 10px;
+        color: #666;
+    }
+
+    /* Form container and styling */
+    .form-container {
+        background-color: white;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    /* Form alerts */
+    .alert {
+        padding: 12px 15px;
+        margin-bottom: 15px;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+    }
+
+    .alert ul {
+        margin-top: 5px;
+        margin-bottom: 0;
+        padding-left: 20px;
+    }
+
+    /* Form group styling */
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 14px;
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 5px;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 8px 12px;
+        font-size: 14px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        transition: border-color 0.15s ease-in-out;
+    }
+
+    .form-input:focus {
+        border-color: #1a3b5d;
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba(26, 59, 93, 0.25);
+    }
+
+    .form-select {
+        width: 100%;
+        padding: 8px 12px;
+        font-size: 14px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        appearance: auto;
+        background-color: #fff;
+    }
+
+    .form-select:focus {
+        border-color: #1a3b5d;
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba(26, 59, 93, 0.25);
+    }
+
+    /* Button styles */
+    .btn {
+        display: inline-block;
+        font-weight: 500;
+        text-align: center;
+        vertical-align: middle;
+        user-select: none;
+        padding: 8px 12px;
+        font-size: 14px;
+        line-height: 1.5;
+        border-radius: 4px;
+        transition: all 0.15s ease-in-out;
+        cursor: pointer;
+        margin: 0 5px;
+    }
+
+    .btn-primary {
+        color: #fff;
+        background-color: #1a3b5d;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: #2c5282;
+    }
+
+    .btn-secondary {
+        color: #fff;
+        background-color: #6c757d;
+        border: none;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+    }
+
+    /* Form actions */
+    .form-actions {
+        margin-top: 20px;
+        text-align: right;
+        padding-top: 10px;
+        border-top: 1px solid #e9ecef;
+    }
+</style>
+
+<div class="content-wrapper">
+    <div class="page-intro">
+        <h4>Sửa Menu</h4>
+        <p>Chỉnh sửa thông tin menu và cài đặt hiển thị.</p>
+    </div>
+    
+    <div class="form-container">
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <strong>Ôi hỏng!</strong> Có lỗi xảy ra nè:<br><br>
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>⚠️ {{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+        
         <form action="{{ route('admin.menu.update', $menus->item_id) }}" method="POST">
             @csrf
-            <div style="margin-bottom: 1rem;">
-                <label style="display: block; font-weight: 500; color: #444; margin-bottom: 5px; font-size: 0.9rem;">Tên Menu</label>
-                <input type="text" name="title" value="{{ $menus->title }}" required
-                    style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; transition: all 0.2s; font-size: 14px; background-color: #f9fafc;">
+            
+            <div class="form-group">
+                <label>Tên Menu</label>
+                <input type="text" name="title" value="{{ $menus->title }}" class="form-input" required>
             </div>
-
-            <div style="margin-bottom: 1rem;">
-                <label style="display: block; font-weight: 500; color: #444; margin-bottom: 5px; font-size: 0.9rem;">Link</label>
-                <input type="text" name="url" value="{{ $menus->url }}" required
-                    style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; transition: all 0.2s; font-size: 14px; background-color: #f9fafc;">
+            
+            <div class="form-group">
+                <label>Liên kết (URL)</label>
+                <input type="text" name="url" value="{{ $menus->url }}" class="form-input">
             </div>
-
-            <div style="margin-bottom: 1rem;">
-                <label style="display: block; font-weight: 500; color: #444; margin-bottom: 5px; font-size: 0.9rem;">Thứ tự hiển thị</label>
-                <input type="number" name="order_index" value="{{ $menus->order_index }}" required
-                    style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; transition: all 0.2s; font-size: 14px; background-color: #f9fafc;">
+            
+            <div class="form-group">
+                <label>Icon Class (FontAwesome, Bootstrap Icon...)</label>
+                <input type="text" name="icon_class" value="{{ $menus->icon_class }}" class="form-input">
             </div>
-
-            <!-- Checkbox Status -->
-            <div style="margin-bottom: 1.2rem; padding: 10px; background-color: #f8f9fa; border-radius: 6px; border-left: 3px solid #6c63ff;">
-                <label style="display: flex; align-items: center; cursor: pointer;">
-                    <input type="checkbox" name="status" id="statusCheckbox" {{ $menus->status === 'active' ? 'checked' : '' }}
-                        style="margin-right: 8px; accent-color: #6c63ff;">
-                    <span style="font-weight: 500; color: #444; font-size: 14px;">Kích hoạt Menu</span>
-                </label>
+            
+            <div class="form-group">
+                <label>Target</label>
+                <select name="target" class="form-select">
+                    <option value="_self" {{ $menus->target === '_self' ? 'selected' : '' }}>_self</option>
+                    <option value="_blank" {{ $menus->target === '_blank' ? 'selected' : '' }}>_blank</option>
+                    <option value="_parent" {{ $menus->target === '_parent' ? 'selected' : '' }}>_parent</option>
+                    <option value="_top" {{ $menus->target === '_top' ? 'selected' : '' }}>_top</option>
+                </select>
             </div>
-
-            <div style="display: flex; gap: 10px; margin-top: 0.8rem;">
-                <a href="{{ route('admin.menu.index') }}" style="flex: 1; padding: 8px 12px; background-color: #f1f1f1; color: #444; text-align: center; border-radius: 6px; font-weight: 500; text-decoration: none; font-size: 14px;">
-                    Quay lại
-                </a>
-                <button type="submit" style="flex: 2; padding: 8px 12px; background: linear-gradient(90deg, #4e54c8, #8f94fb); color: white; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; font-size: 14px;">
-                    Cập nhật
-                </button>
+            
+            <div class="form-group">
+                <label>Thứ tự hiển thị</label>
+                <input type="number" name="order_index" value="{{ $menus->order_index }}" class="form-input">
+            </div>
+            
+            <div class="form-group">
+                <label>Trạng thái</label>
+                <select name="status" class="form-select">
+                    <option value="active" {{ $menus->status === 'active' ? 'selected' : '' }}>Hiển thị</option>
+                    <option value="inactive" {{ $menus->status === 'inactive' ? 'selected' : '' }}>Ẩn</option>
+                </select>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">💾 Cập nhật</button>
+                <a href="{{ route('admin.menu.index') }}" class="btn btn-secondary">↩️ Quay lại</a>
             </div>
         </form>
     </div>

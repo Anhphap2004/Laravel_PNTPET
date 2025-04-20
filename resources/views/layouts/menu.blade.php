@@ -33,7 +33,8 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <div class="navbar-nav mx-auto py-0">
                 @foreach ($menuItems as $menu)
-                    <a style="color: #b31818" href="{{ url($menu->url) }}" class="nav-item fw-bolder text-uppercase nav-link fw-medium mx-2 {{ request()->is(trim($menu->url, '/')) ? 'active' : '' }}">
+                <a style="color: #b31818" href="{{ url($menu->url ?? '#') }}" class="nav-item fw-bolder text-uppercase nav-link fw-medium mx-2 {{ request()->is(trim($menu->url, '/')) ? 'active' : '' }}">
+
                         {{ $menu->title }}
                     </a>
                 @endforeach

@@ -1,88 +1,387 @@
 @extends('admin.layouts.master')
 
 @section('content')
-<div class="container d-flex flex-column align-items-center" style="max-width: 90%; margin: 0 auto;">
-    <h2 class="my-4" style="color: #3a3a3a; font-weight: 700; text-align: center; position: relative; padding-bottom: 15px; margin-top: 2rem !important;">
-        Danh sách Menu
-        <span style="display: block; width: 100px; height: 3px; background: linear-gradient(90deg, #6c63ff, #b382ff); position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); border-radius: 10px;"></span>
-    </h2>
+<style>
+    /* Fix sidebar overlap issue */
+    .content-wrapper {
+        margin-left: 230px;
+        padding: 15px 20px 0 20px;
+        background-color: white;
+    }
 
-    <a href="{{ route('admin.menu.create') }}" class="btn btn-primary mb-4" style="background: linear-gradient(90deg, #4e54c8, #8f94fb); border: none; border-radius: 8px; padding: 10px 20px; font-weight: 600; box-shadow: 0 4px 10px rgba(78, 84, 200, 0.3);">
-        <i class="fas fa-plus-circle mr-2"></i> Thêm Menu
-    </a>
+    /* Responsive adjustment for mobile */
+    @media (max-width: 992px) {
+        .content-wrapper {
+            margin-left: 0;
+            padding: 10px;
+        }
+    }
 
-    <div class="table-responsive" style="width: 90%; background: linear-gradient(145deg, #f6f8fa, #ffffff); border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); padding: 1.5rem; margin-bottom: 2rem;">
-        <table class="table table-bordered text-center" style="border-radius: 10px; overflow: hidden; border-collapse: separate; border-spacing: 0; border: none;">
-            <thead style="background: linear-gradient(90deg, #4e54c8, #8f94fb); color: white;">
+    /* Page header and intro */
+    .page-intro {
+        margin-bottom: 15px;
+    }
+
+    .page-intro h4 {
+        margin-top: 0;
+        margin-bottom: 5px;
+        color: #333;
+        font-weight: 600;
+    }
+
+    .page-intro p {
+        margin-top: 0;
+        margin-bottom: 10px;
+        color: #666;
+    }
+
+    /* Table container and styling */
+    .table-container {
+        background-color: white;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        padding: 15px;
+        margin-bottom: 20px;
+        overflow-x: auto;
+    }
+
+    .table-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .table-header h5 {
+        margin: 0;
+        color: #1a3b5d;
+        font-weight: 600;
+    }
+
+    /* Action buttons */
+    .btn-primary {
+        background-color: #1a3b5d;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s;
+    }
+
+    .btn-primary:hover {
+        background-color: #2c5282;
+    }
+
+    .btn-outline-secondary {
+        background-color: white;
+        color: #6c757d;
+        border: 1px solid #6c757d;
+        padding: 5px 11px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #f8f9fa;
+    }
+
+    /* Table styling */
+    .compact-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+
+    .compact-table thead {
+        background-color: #f8f9fa;
+    }
+
+    .compact-table th {
+        padding: 12px 8px;
+        color: #495057;
+        font-weight: 600;
+        border-bottom: 2px solid #dee2e6;
+        white-space: nowrap;
+        text-align: left;
+    }
+
+    .compact-table td {
+        padding: 10px 8px;
+        vertical-align: middle;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .compact-table tbody tr:hover {
+        background-color: rgba(26, 59, 93, 0.04);
+    }
+
+    /* Status badges */
+    .badge {
+        display: inline-block;
+        padding: 3px 6px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 500;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    .badge-primary {
+        background-color: #cfe2ff;
+        color: #0d6efd;
+    }
+
+    .badge-success {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .badge-secondary {
+        background-color: #f0f0f0;
+        color: #666;
+    }
+
+    /* Search input */
+    .search-input {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        margin-bottom: 15px;
+        font-size: 14px;
+    }
+    
+    .search-input:focus {
+        border-color: #1a3b5d;
+        outline: none;
+        box-shadow: 0 0 0 0.2rem rgba(26, 59, 93, 0.25);
+    }
+
+    /* Action links */
+    .action-links {
+        white-space: nowrap;
+    }
+
+    .action-links a {
+        display: inline-block;
+        margin: 0 3px;
+        padding: 4px 6px;
+        border-radius: 4px;
+        text-decoration: none;
+        color: #1a3b5d;
+    }
+
+    .action-links a:hover {
+        background-color: #f0f0f0;
+    }
+
+    /* Pagination styles */
+    .pagination {
+        display: flex;
+        padding-left: 0;
+        list-style: none;
+        margin: 15px 0 0;
+    }
+
+    .pagination .page-item {
+        margin: 0 2px;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: #1a3b5d;
+        border-color: #1a3b5d;
+        color: white;
+    }
+
+    .pagination .page-link {
+        padding: 5px 10px;
+        color: #1a3b5d;
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 3px;
+        text-decoration: none;
+    }
+
+    .pagination .page-link:hover {
+        background-color: #f8f9fa;
+    }
+
+    /* Footer */
+    .table-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+        color: #666;
+        margin-top: 10px;
+    }
+
+    /* Status circle indicator */
+    .status-circle {
+        display: inline-block;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        color: white;
+        line-height: 22px;
+        font-size: 14px;
+        text-align: center;
+    }
+
+    .status-active {
+        background-color: #2e7d32;
+    }
+
+    .status-inactive {
+        background-color: #e74c3c;
+    }
+
+    /* Action buttons */
+    .btn-edit {
+        background-color: #FFC107;
+        color: #333;
+        border: none;
+        padding: 6px 10px;
+        border-radius: 4px;
+        font-size: 13px;
+        margin-right: 5px;
+    }
+    
+    .btn-delete {
+        background-color: #FF5252;
+        color: white;
+        border: none;
+        padding: 6px 10px;
+        border-radius: 4px;
+        font-size: 13px;
+    }
+</style>
+
+<div class="content-wrapper">
+    <div class="page-intro">
+        <h4>Quản lý danh sách Menu</h4>
+        <p>Cập nhật thông tin, thứ tự hiển thị và trạng thái của các menu trong hệ thống.</p>
+    </div>
+
+    <div class="table-container">
+        <div class="table-header">
+            <h5>Danh sách Menu</h5>
+            <div>
+                <a href="{{ route('admin.menu.create') }}" class="btn-primary">
+                    <i class="fa fa-plus-circle"></i> Thêm mới
+                </a>
+            </div>
+        </div>
+        
+        <div>
+            <input type="text" id="searchInput" class="search-input" placeholder="Tìm kiếm menu..." onkeyup="filterTable()">
+        </div>
+        
+        <table class="compact-table">
+            <thead>
                 <tr>
-                    <th style="border: none; padding: 1rem; font-weight: 600; border-top-left-radius: 10px;">ID</th>
-                    <th style="border: none; padding: 1rem; font-weight: 600;">Tên Menu</th>
-                    <th style="border: none; padding: 1rem; font-weight: 600;">Link</th>
-                    <th style="border: none; padding: 1rem; font-weight: 600;">Vị Trí</th>
-                    <th style="border: none; padding: 1rem; font-weight: 600;">Trạng Thái</th>
-                    <th style="border: none; padding: 1rem; font-weight: 600; border-top-right-radius: 10px;">Hành động</th>
+                    <th>ID</th>
+                    <th>Tên Menu</th>
+                    <th>Link</th>
+                    <th>Vị trí</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach ($menus as $menu)
-                <tr style="background-color: {{ $loop->even ? '#f8f9fa' : 'white' }}; transition: all 0.3s ease;">
-                    <td style="border: 1px solid #e9ecef; padding: 12px;">{{ $menu->item_id }}</td>
-                    <td style="border: 1px solid #e9ecef; padding: 12px; font-weight: 500;">{{ $menu->title }}</td>
-                    <td style="border: 1px solid #e9ecef; padding: 12px;">{{ $menu->url }}</td>
-                    <td style="border: 1px solid #e9ecef; padding: 12px;">{{ $menu->order_index }}</td>
-                   <td style="border: 1px solid #e9ecef; padding: 12px; text-align: center;">
-    @if($menu->status == 'active')
-        <span style="display: inline-block; width: 22px; height: 22px; background-color: #2ecc71; border-radius: 50%; color: white; line-height: 22px; font-size: 14px;">
-            <i class="fas fa-check" style="vertical-align: middle;"></i>
-        </span>
-    @else
-        <span style="display: inline-block; width: 22px; height: 22px; background-color: #e74c3c; border-radius: 50%; color: white; line-height: 22px; font-size: 14px;">
-            <i class="fas fa-times" style="vertical-align: middle;"></i>
-        </span>
-    @endif
-</td>
-                    <td style="border: 1px solid #e9ecef; padding: 12px;">
-                        <a href="{{ route('admin.menu.edit', $menu->item_id) }}" class="btn btn-sm" style="background: linear-gradient(90deg, #ffa751, #ffe259); border: none; color: #333; font-weight: 600; margin-right: 5px; padding: 6px 12px; border-radius: 6px; box-shadow: 0 2px 5px rgba(255, 167, 81, 0.3);">
-                            <i class="fas fa-edit mr-1"></i> Sửa
+                <tr>
+                    <td>{{ $menu->item_id }}</td>
+                    <td>
+                        <div style="font-weight: 500; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            {{ $menu->title }}
+                        </div>
+                    </td>
+                    <td>
+                        <div style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            {{ $menu->url }}
+                        </div>
+                    </td>
+                    <td>{{ $menu->order_index }}</td>
+                    <td class="text-center">
+                        @if($menu->status == 'active')
+                            <span class="status-circle status-active">
+                                <i class="fa fa-check"></i>
+                            </span>
+                        @else
+                            <span class="status-circle status-inactive">
+                                <i class="fa fa-times"></i>
+                            </span>
+                        @endif
+                    </td>
+                    <td>
+                        <a href="{{ route('admin.menu.edit', $menu->item_id) }}" class="btn-edit">
+                            <i class="fa fa-edit"></i> Sửa
                         </a>
-                        <form action="{{ route('admin.menu.destroy', $menu->item_id) }}" method="POST" style="display:inline;">
-                            @csrf
-                            <button type="submit" class="btn btn-sm" style="background: linear-gradient(90deg, #ff6b6b, #ff8e8e); border: none; color: white; font-weight: 600; padding: 6px 12px; border-radius: 6px; box-shadow: 0 2px 5px rgba(255, 107, 107, 0.3);">
-                                <i class="fas fa-trash-alt mr-1"></i> Xóa
-                            </button>
-                        </form>
+                        <form action="{{ route('admin.menu.destroy', ['id' => $menu->item_id]) }}" 
+                            method="POST" 
+                            style="display:inline-block;" 
+                            onsubmit="return confirm('Bạn có chắc muốn xoá menu này không?');">
+                          @csrf
+                          @method('DELETE')
+                          <button type="submit" class="btn btn-danger btn-sm">
+                              <i class="fa fa-trash"></i> Xoá
+                          </button>
+                      </form>
+                      
+                        
                     </td>
                 </tr>
                 @endforeach
             </tbody>
         </table>
+        
+        <div class="table-footer">
+            <div>Hiển thị <span class="font-weight-bold">1-{{ count($menus) }}</span> của <span class="font-weight-bold">{{ count($menus) }}</span> bản ghi</div>
+            <ul class="pagination">
+                <li class="page-item disabled"><a class="page-link" href="#">&laquo;</a></li>
+                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
+            </ul>
+        </div>
     </div>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Hiệu ứng hover cho các dòng
-    const tableRows = document.querySelectorAll('tbody tr');
-    tableRows.forEach(row => {
-        row.addEventListener('mouseover', function() {
-            this.style.transform = 'translateY(-3px)';
-            this.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
-        });
+    function filterTable() {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("searchInput");
+        filter = input.value.toUpperCase();
+        table = document.querySelector(".compact-table");
+        tr = table.getElementsByTagName("tr");
 
-        row.addEventListener('mouseout', function() {
-            this.style.transform = 'translateY(0)';
-            this.style.boxShadow = 'none';
-        });
-    });
+        // Bắt đầu từ i = 1 để bỏ qua hàng tiêu đề
+        for (i = 1; i < tr.length; i++) {
+            // Lấy ô ID (index 0) và Tên Menu (index 1)
+            tdId = tr[i].getElementsByTagName("td")[0];
+            tdTitle = tr[i].getElementsByTagName("td")[1];
+            tdUrl = tr[i].getElementsByTagName("td")[2];
+            
+            if (tdId || tdTitle || tdUrl) {
+                txtId = tdId.textContent || tdId.innerText;
+                txtTitle = tdTitle.textContent || tdTitle.innerText;
+                txtUrl = tdUrl.textContent || tdUrl.innerText;
 
-    // Hiệu ứng "lấp lánh" cho tiêu đề
-    const title = document.querySelector('h2');
-    setInterval(() => {
-        title.style.textShadow = '0 0 10px rgba(108, 99, 255, 0.7)';
-        setTimeout(() => {
-            title.style.textShadow = 'none';
-        }, 300);
-    }, 3000);
-});
+                if (txtId.toUpperCase().indexOf(filter) > -1 || 
+                    txtTitle.toUpperCase().indexOf(filter) > -1 ||
+                    txtUrl.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
 </script>
 @endsection
