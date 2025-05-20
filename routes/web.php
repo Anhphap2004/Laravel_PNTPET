@@ -67,7 +67,6 @@ Route::prefix('admin')->group(function () {
     Route::get('/menu/edit/{id}', [AdminMenuController::class, 'edit'])->name('admin.menu.edit');
     Route::post('/menu/update/{id}', [AdminMenuController::class, 'update'])->name('admin.menu.update');
     Route::delete('/admin/menu/destroy/{id}', [AdminMenuController::class, 'destroy'])->name('admin.menu.destroy');
-
 });
 
 use App\Http\Controllers\LogoutAdminController;
@@ -78,6 +77,7 @@ Route::post('/admin/logout', [LogoutAdminController::class, 'logoutAdmin'])->nam
 
 
 use App\Http\Controllers\AdminUserController;
+
 Route::post('/users/store', [AdminUserController::class, 'store'])->name('admin.users.store');
 Route::get('/admin/users', [AdminUserController::class, 'index'])->name('admin.users.index');
 Route::get('/users/create', [AdminUserController::class, 'create'])->name('admin.users.create');
@@ -92,11 +92,11 @@ use App\Http\Controllers\AdminAboutController;
 
 Route::prefix('admin')->middleware('auth')->group(function () {
     Route::get('/about', [AdminAboutController::class, 'index'])->name('admin.about.index');
-    Route::get('about/create', [AdminAboutController::class, 'create'])->name('admin.about.create'); 
-    Route::post('about/store', [AdminAboutController::class, 'store'])->name('admin.about.store');  
+    Route::get('about/create', [AdminAboutController::class, 'create'])->name('admin.about.create');
+    Route::post('about/store', [AdminAboutController::class, 'store'])->name('admin.about.store');
     Route::put('about/{id}', [AdminAboutController::class, 'update'])->name('admin.about.update');
-     // 👉 Route edit và update
-     Route::get('/about/{id}/edit', [AdminAboutController::class, 'edit'])->name('admin.about.edit');
+    // 👉 Route edit và update
+    Route::get('/about/{id}/edit', [AdminAboutController::class, 'edit'])->name('admin.about.edit');
 });
 
 use App\Http\Controllers\AdminServicesController;
@@ -125,6 +125,7 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::get('/animals/{id}/edit', [AdminAnimalsController::class, 'edit'])->name('admin.animals.edit');
     Route::put('/animals/{id}', [AdminAnimalsController::class, 'update'])->name('admin.animals.update');
 });
+
 use App\Http\Controllers\AdminBlogController;
 
 Route::prefix('admin')->middleware('auth')->group(function () {
@@ -138,6 +139,7 @@ Route::prefix('admin')->middleware('auth')->group(function () {
 });
 
 use App\Http\Controllers\AdminContactController;
+
 Route::prefix('admin')->name('admin.')->group(function () {
     // Hiển thị danh sách contact messages
     Route::get('contact', [AdminContactController::class, 'index'])->name('contact.index');
@@ -174,4 +176,17 @@ Route::prefix('admin')->middleware('auth')->group(function () {
 });
 
 
+use App\Http\Controllers\LuckyDrawController;
 
+Route::get('/lucky-draw', [LuckyDrawController::class, 'showDrawPage'])->name('lucky.draw');
+Route::post('/spin-wheel', [LuckyDrawController::class, 'spinWheel'])->name('spin.wheel');
+
+
+
+use App\Http\Controllers\ChatbotController;
+
+// Route trang chủ, load giao diện index.blade.php
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Route API chatbot, nhận message và trả lời, gọi bằng fetch AJAX
+Route::post('/chatbot', 'App\Http\Controllers\ChatbotController@handle');

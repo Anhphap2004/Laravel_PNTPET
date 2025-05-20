@@ -8,9 +8,18 @@
                 <h6 class="text-danger text-uppercase">THÚ CƯNG</h6>
                 <h1 class="display-5 text-uppercase mb-0">THƯ VIỆN THÚ CƯNG</h1>
             </div>
+            <form action="{{ route('animals.index') }}" method="GET" class="mb-4">
+                <div class="input-group">
+                    <input type="text" name="keyword" class="form-control" placeholder="Tìm tên hoặc giống loài thú cưng..." value="{{ request('keyword') }}">
+                    <button class="btn btn-danger" type="submit">🔍 Tìm kiếm</button>
+                </div>
+            </form>
         </div>
 
  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+
+
+
 
         @forelse($animals as $animal)
             <div class="col">

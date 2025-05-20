@@ -158,7 +158,7 @@
         <h4>Chỉnh sửa người dùng</h4>
         <p>Cập nhật thông tin tài khoản người dùng.</p>
     </div>
-    
+
     <div class="form-container">
         @if ($errors->any())
             <div class="alert alert-danger">
@@ -170,30 +170,30 @@
                 </ul>
             </div>
         @endif
-        
+
         <form action="{{ route('admin.users.update', $user->user_id) }}" method="POST">
             @csrf
             @method('PUT')
-            
+
             <div class="form-group">
                 <label for="username">Họ tên</label>
                 <input type="text" name="username" class="form-input" value="{{ $user->username }}" required>
-                
+
             </div>
-            
+
             <div class="form-group">
                 <label for="email">Email</label>
                 <input type="email" name="email" class="form-input" value="{{ $user->email }}" required>
             </div>
-            
+
             <div class="form-group">
                 <label for="role">Vai trò</label>
                 <select name="role" class="form-select">
                     <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin</option>
-                    <option value="user" {{ $user->role == 'user' ? 'selected' : '' }}>User</option>
+                    <option value="user" {{ $user->role == 'customer' ? 'selected' : '' }}>Customer</option>
                 </select>
             </div>
-            
+
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary">💾 Cập nhật</button>
                 <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">↩️ Quay lại</a>

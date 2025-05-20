@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -7,11 +8,23 @@ use Illuminate\Support\Facades\Auth;
 
 class AnimalController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $animals = DB::table('animals')->orderBy('created_at', 'desc')->get();
+        $query = DB::table('animals')->orderBy('created_at', 'desc');
+
+        if ($request->has('keyword') && $request->keyword != '') {
+            $keyword = $request->keyword;
+            $query->where(function ($q) use ($keyword) {
+                $q->where('name', 'like', '%' . $keyword . '%')
+                    ->orWhere('breed', 'like', '%' . $keyword . '%');
+            });
+        }
+
+        $animals = $query->get();
+
         return view('animals.index', compact('animals'));
     }
+
 
     public function detail($id)
     {
@@ -77,4 +90,3 @@ class AnimalController extends Controller
         return back()->with('success', 'Bình luận của bạn đã được gửi!');
     }
 }
-
